@@ -1,3 +1,5 @@
+from typing import Optional
+
 import requests
 
 
@@ -12,11 +14,11 @@ class TheCocktailDbController:
         response = requests.get(self.get_a_list_of_cocktails_by_first_letter_url.format(letter))
         return response
 
-    def get_a_list_of_cocktails_by_first_letter(self, letter: str) -> dict:
+    def get_a_list_of_cocktails_by_first_letter(self, letter: str) -> Optional[dict]:
         response = self.get_response_from_get_a_list_of_cocktails_by_first_letter_endpoint(letter)
-        if response.status_code == 200:
-            drink_list = response.json()['drinks']
-            return drink_list
-        else:
-            print("Something went wrong!")
+        response.raise_for_status()
+        if response.status_code != 200:
+            raise ValueError(f"Response status code other than 200!: {response.status_code}")
+        drink_list = response.json()['drinks']
+        return drink_list
 
